@@ -1,0 +1,8 @@
+Using manually selected typst v0.3.0
+error: unknown variable: missing-value – if you meant to use subtraction, try adding spaces around the minus sign.
+  ┌─ /compile/main.typ:1:14
+  │
+1 │ #let answer = missing-value
+  │               ^^^^^^^^^^^^^
+
+Typst failed with exit code 1

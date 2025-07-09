@@ -9,9 +9,9 @@
     ],
     "syscalls": [
         {
-          "name": "getrandom",
-          "action": "SCMP_ACT_ALLOW",
-          "args": []
+            "name": "getrandom",
+            "action": "SCMP_ACT_ALLOW",
+            "args": []
         },
         {
             "name": "access",
@@ -546,6 +546,11 @@
             "args": []
         },
         {
+            "name": "rseq",
+            "action": "SCMP_ACT_ALLOW",
+            "args": []
+        },
+        {
             "name": "rt_sigaction",
             "action": "SCMP_ACT_ALLOW",
             "args": []
@@ -681,6 +686,11 @@
             "args": []
         },
         {
+            "name": "statx",
+            "action": "SCMP_ACT_ALLOW",
+            "args": []
+        },
+        {
             "name": "sync",
             "action": "SCMP_ACT_ALLOW",
             "args": []
@@ -812,6 +822,11 @@
         },
         {
             "name": "writev",
+            "action": "SCMP_ACT_ALLOW",
+            "args": []
+        },
+        {
+            "name": "poll",
             "action": "SCMP_ACT_ALLOW",
             "args": []
         },

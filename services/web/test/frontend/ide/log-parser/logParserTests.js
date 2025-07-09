@@ -1,6 +1,9 @@
 import { expect } from 'chai'
+import sinon from 'sinon'
 import LatexLogParser from '../../../../frontend/js/ide/log-parser/latex-log-parser'
 import BibLogParser from '../../../../frontend/js/ide/log-parser/bib-log-parser'
+import TypstLogParser from '../../../../frontend/js/ide/log-parser/typst-log-parser'
+import { handleLogFiles } from '../../../../frontend/js/features/pdf-preview/util/output-files'
 
 const fixturePath = '../../helpers/fixtures/logs/'
 const fs = require('fs')
@@ -427,6 +430,199 @@ describe('logParser', function () {
       [102, 'Undefined control sequence.', './main.tex'],
     ])
   })
+
+  describe('Typst', function () {
+    it('should parse diagnostics from older Typst versions', function () {
+      const result = parseTypstLog('typst-v0.3.0.log')
+
+      expect(result.warnings).to.be.empty
+      expect(
+        result.errors.map(entry => [
+          entry.line,
+          entry.column,
+          entry.file,
+          entry.message,
+        ])
+      ).to.deep.equal([
+        [
+          1,
+          14,
+          '/compile/main.typ',
+          'unknown variable: missing-value – if you meant to use subtraction, try adding spaces around the minus sign.',
+        ],
+      ])
+      expect(result.errors[0].content).to.include('^^^^^^^^^^^^^')
+      expect(result.errors[0].raw).not.to.include('Typst failed')
+    })
+
+    it('should parse warnings, errors, and hints from newer versions', function () {
+      const result = parseTypstLog('typst-v0.13.1.log')
+
+      expect(result.all.map(entry => entry.level)).to.deep.equal([
+        'warning',
+        'error',
+      ])
+      expect(
+        result.warnings.map(entry => [
+          entry.line,
+          entry.column,
+          entry.file,
+          entry.message,
+        ])
+      ).to.deep.equal([
+        [
+          1,
+          16,
+          '/compile/main.typ',
+          'unknown font family: definitely missing font',
+        ],
+      ])
+      expect(result.errors[0]).to.include({
+        line: 7,
+        column: 1,
+        file: '/compile/main.typ',
+        message: 'unknown variable: missing-value',
+      })
+      expect(result.errors[0].content).to.include(
+        'hint: if you meant to use subtraction'
+      )
+    })
+
+    it('should parse the short diagnostic format', function () {
+      const result = parseTypstLog('typst-short.log')
+
+      expect(
+        result.all.map(entry => [
+          entry.level,
+          entry.file,
+          entry.line,
+          entry.column,
+          entry.message,
+        ])
+      ).to.deep.equal([
+        [
+          'warning',
+          '/compile/chapters/introduction.typ',
+          12,
+          8,
+          'unknown font family: missing font',
+        ],
+        [
+          'error',
+          '/compile/main.typ',
+          4,
+          2,
+          'unknown variable: missing-value',
+        ],
+      ])
+    })
+
+    it('should handle terminal colors, Windows line endings, and diagnostics without locations', function () {
+      const escape = String.fromCharCode(27)
+      const result = new TypstLogParser(
+        `${escape}[31merror:${escape}[0m input file is not a Typst source file\r\n`
+      ).parse()
+
+      expect(result.errors).to.deep.equal([
+        {
+          line: null,
+          column: undefined,
+          file: undefined,
+          level: 'error',
+          message: 'input file is not a Typst source file',
+          content: undefined,
+          raw: 'error: input file is not a Typst source file',
+        },
+      ])
+    })
+
+    it('should use Typst diagnostics for compile log entries', async function () {
+      const log = readLog('typst-v0.13.1.log')
+      const fetchStub = sinon.stub(globalThis, 'fetch').resolves({
+        ok: true,
+        body: new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode(log))
+            controller.close()
+          },
+        }),
+      })
+
+      let result
+      try {
+        result = await handleLogFiles(
+          new Map([
+            [
+              'output.log',
+              {
+                build: 'build-id',
+                url: '/build/output.log',
+              },
+            ],
+          ]),
+          {
+            options: { compiler: 'typst' },
+            pdfDownloadDomain: 'https://compiles.test',
+            status: 'error',
+          },
+          new AbortController().signal
+        )
+      } finally {
+        fetchStub.restore()
+      }
+
+      expect(result.log).to.equal(log)
+      expect(result.logEntries.errors).to.have.length(1)
+      expect(result.logEntries.warnings).to.have.length(1)
+      expect(result.logEntries.errors[0]).to.include({
+        file: 'main.typ',
+        line: 7,
+        column: 1,
+        level: 'error',
+        message: 'unknown variable: missing-value',
+      })
+      expect(result.logEntries.all).to.have.length(2)
+    })
+
+    it('should select the Typst parser from compile metadata only', async function () {
+      const log = readLog('typst-v0.13.1.log')
+      const fetchStub = sinon.stub(globalThis, 'fetch').resolves({
+        ok: true,
+        body: new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode(log))
+            controller.close()
+          },
+        }),
+      })
+      const typstParseStub = sinon.stub(TypstLogParser.prototype, 'parse')
+
+      try {
+        await handleLogFiles(
+          new Map([
+            [
+              'output.log',
+              {
+                build: 'build-id',
+                url: '/build/output.log',
+              },
+            ],
+          ]),
+          {
+            options: { compiler: 'pdflatex' },
+            pdfDownloadDomain: 'https://compiles.test',
+            status: 'error',
+          },
+          new AbortController().signal
+        )
+      } finally {
+        fetchStub.restore()
+        typstParseStub.restore()
+      }
+
+      expect(typstParseStub).not.to.have.been.called
+    })
+  })
 })
 
 function readLog(filename) {
@@ -440,4 +636,8 @@ function parseLatexLog(filename, opts = {}) {
   const log = readLog(filename)
   const parser = new LatexLogParser(log, opts)
   return parser.parse()
+}
+
+function parseTypstLog(filename) {
+  return new TypstLogParser(readLog(filename)).parse()
 }

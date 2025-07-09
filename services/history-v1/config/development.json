@@ -1,6 +1,7 @@
 {
   "databaseUrl": "postgres://postgres:postgres@postgres/write_latex_dev",
   "persistor": {
+    "useSubdirectories": true,
     "s3": {
       "endpoint": "http://s3:8080",
       "pathStyle": "true"

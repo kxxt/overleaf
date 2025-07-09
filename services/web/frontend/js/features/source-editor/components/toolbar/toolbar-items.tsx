@@ -207,6 +207,93 @@ export const ToolbarItems: FC<{
           )}
         </>
       )}
+
+      {languageName === 'typst' && (
+        <>
+          {showGroup('group-format') && (
+            <div
+              className="ol-cm-toolbar-button-group"
+              aria-label={t('toolbar_text_style')}
+            >
+              <ToolbarButton
+                id="toolbar-format-bold"
+                label={t('toolbar_bold')}
+                command={commands.toggleTypstStrong}
+                active={isActive('typst-strong')}
+                icon="format_bold"
+                shortcut={isMac ? '⌘B' : 'Ctrl+B'}
+              />
+              <ToolbarButton
+                id="toolbar-format-italic"
+                label={t('toolbar_italic')}
+                command={commands.toggleTypstEmph}
+                active={isActive('typst-emph')}
+                icon="format_italic"
+                shortcut={isMac ? '⌘I' : 'Ctrl+I'}
+              />
+            </div>
+          )}
+          {showGroup('group-math') && (
+            <div
+              className="ol-cm-toolbar-button-group"
+              data-overflow="group-math"
+              aria-label={t('toolbar_insert_math_and_symbols')}
+            >
+              <MathDropdown />
+            </div>
+          )}
+          {showGroup('group-misc') && (
+            <div
+              className="ol-cm-toolbar-button-group"
+              data-overflow="group-misc"
+              aria-label={t('toolbar_insert_misc')}
+            >
+              <ToolbarButton
+                id="toolbar-href"
+                label={t('toolbar_insert_link')}
+                command={commands.wrapInHref}
+                icon="add_link"
+              />
+              {features.trackChangesVisible && permissions.comment && (
+                <ToolbarButton
+                  id="toolbar-add-comment"
+                  label={t('add_comment')}
+                  disabled={isCursorOnEmptyLine(state)}
+                  command={addCommentFromToolbar}
+                  icon="add_comment"
+                />
+              )}
+              <ToolbarButton
+                id="toolbar-ref"
+                label={t('toolbar_insert_cross_reference')}
+                command={commands.insertRef}
+                icon="sell"
+              />
+              <ToolbarButton
+                id="toolbar-cite"
+                label={t('toolbar_insert_citation')}
+                command={commands.insertCite}
+                icon="book_5"
+              />
+              <InsertFigureDropdown />
+              {writefullInstance || showAiFeaturesDisabled ? (
+                <TableDropdown />
+              ) : (
+                <LegacyTableDropdown />
+              )}
+            </div>
+          )}
+          {showGroup('group-list') && (
+            <div
+              className="ol-cm-toolbar-button-group"
+              data-overflow="group-list"
+              aria-label={t('toolbar_list_indentation')}
+            >
+              <InsertListDropdown />
+            </div>
+          )}
+        </>
+      )}
     </>
   )
 })

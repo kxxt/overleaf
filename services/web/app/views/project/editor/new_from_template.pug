@@ -29,6 +29,8 @@ block content
 		input(type="hidden" name="templateVersionId" value=templateVersionId)
 		input(type="hidden" name="templateName" value=name)
 		input(type="hidden" name="compiler" value=compiler)
+		if typstVersion
+			input(type="hidden" name="typstVersion" value=typstVersion)
 		if imageName
 			input(type="hidden" name="imageName" value=imageName)
 		input(type="hidden" name="mainFile" value=mainFile)

@@ -5,5 +5,7 @@ export const snippets = {
   figure: prepareSnippetTemplate(environments.get('figure') as string),
   table: prepareSnippetTemplate(environments.get('table') as string),
   cite: prepareSnippetTemplate('\\cite{${}}'),
+  typstCite: prepareSnippetTemplate('@${}'),
   ref: prepareSnippetTemplate('\\ref{${}}'),
+  typstRef: prepareSnippetTemplate('@${}'),
 }

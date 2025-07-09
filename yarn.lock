@@ -7417,6 +7417,7 @@ __metadata:
     chartjs-plugin-datalabels: "npm:^2.2.0"
     cheerio: "npm:1.0.0-rc.10"
     classnames: "npm:^2.2.6"
+    codemirror-lang-typst: "npm:0.4.0"
     confusing-browser-globals: "npm:^1.0.11"
     connect-redis: "npm:^6.1.3"
     content-disposition: "npm:^0.5.0"
@@ -15051,6 +15052,19 @@ __metadata:
     log: "npm:>= 1.2.0"
     mkdirp: "npm:>= 0.0.1"
   checksum: 10c0/7e6fe85540e46155329b44c8e2969e891f1e211583906721a34edd4bb194b699844a1ed7b7f5ac1444f17868bcd9313fda2ddc06a6626428143a8ee8f47d1594
+  languageName: node
+  linkType: hard
+
+"codemirror-lang-typst@npm:0.4.0":
+  version: 0.4.0
+  resolution: "codemirror-lang-typst@npm:0.4.0"
+  dependencies:
+    "@codemirror/language": "npm:^6.11.2"
+    "@codemirror/state": "npm:^6.5.2"
+    "@codemirror/view": "npm:^6.38.1"
+    "@lezer/common": "npm:^1.2.3"
+    "@lezer/highlight": "npm:^1.2.1"
+  checksum: 10c0/cad39ac57325945cbe5f361d2d1c1ce7c11e12f4a09471608a50e2dc96f645dc15d14ab0f9cf1a18de28c632dba130be00d3fba1e378f10940404981c438184f
   languageName: node
   linkType: hard
 

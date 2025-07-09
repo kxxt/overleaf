@@ -1,0 +1,16 @@
+Using manually selected typst v0.13.1
+warning: unknown font family: definitely missing font
+  ┌─ /compile/main.typ:1:16
+  │
+1 │ #set text(font: "Definitely Missing Font")
+  │                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: unknown variable: missing-value
+  ┌─ /compile/main.typ:7:1
+  │
+7 │ #missing-value
+  │  ^^^^^^^^^^^^^
+  │
+  = hint: if you meant to use subtraction, try adding spaces around the minus sign: `missing - value`
+
+Typst failed with exit code 1

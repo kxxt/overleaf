@@ -16,6 +16,7 @@ const ENGINE_TO_COMPILER_MAP = {
   pdflatex: 'pdflatex',
   xelatex: 'xelatex',
   lualatex: 'lualatex',
+  typst: 'typst',
 }
 
 export default {

@@ -50,6 +50,7 @@ async function duplicate(
     originalProjectId,
     {
       compiler: true,
+      typstVersion: true,
       imageName: true,
       rootFolder: true,
       rootDoc_id: true,
@@ -145,6 +146,10 @@ async function duplicate(
     await ProjectOptionsHandler.promises.setCompiler(
       newProject._id,
       originalProject.compiler
+    )
+    await ProjectOptionsHandler.promises.setTypstVersion(
+      newProject._id,
+      originalProject.typstVersion
     )
     const [docEntries, fileEntries] = await Promise.all([
       _copyDocs(

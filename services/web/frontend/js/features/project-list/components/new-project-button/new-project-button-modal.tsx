@@ -12,6 +12,7 @@ const ImportDocumentModal = lazy(() => import('./import-document-modal'))
 
 export type NewProjectButtonModalVariant =
   | 'blank_project'
+  | 'blank_typst_project'
   | 'example_project'
   | 'upload_project'
   | 'import_from_github'
@@ -51,7 +52,21 @@ function NewProjectButtonModal({
 
   switch (modal) {
     case 'blank_project':
-      return <BlankProjectModal onHide={onHide} initialTags={initialTags} />
+      return (
+        <BlankProjectModal
+          onHide={onHide}
+          initialTags={initialTags}
+          language="latex"
+        />
+      )
+    case 'blank_typst_project':
+      return (
+        <BlankProjectModal
+          onHide={onHide}
+          initialTags={initialTags}
+          language="typst"
+        />
+      )
     case 'example_project':
       return <ExampleProjectModal onHide={onHide} initialTags={initialTags} />
     case 'upload_project':

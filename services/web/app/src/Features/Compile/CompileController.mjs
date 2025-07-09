@@ -570,6 +570,16 @@ const _CompileController = {
     )
     res.json(body)
   },
+
+  async getTypstVersions(req, res) {
+    const projectId = req.params.Project_id
+    const userId = CompileController._getUserIdForCompile(req)
+    const versions = await CompileManager.promises.getTypstVersions(
+      projectId,
+      userId
+    )
+    res.json(versions)
+  },
 }
 
 async function _downloadFromClsi(
@@ -783,6 +793,7 @@ const CompileController = {
   proxySyncPdf: expressify(_CompileController.proxySyncPdf),
   proxySyncCode: expressify(_CompileController.proxySyncCode),
   wordCount: expressify(_CompileController.wordCount),
+  getTypstVersions: expressify(_CompileController.getTypstVersions),
 
   _getSafeProjectName: _CompileController._getSafeProjectName,
   _getSplitTestOptions,

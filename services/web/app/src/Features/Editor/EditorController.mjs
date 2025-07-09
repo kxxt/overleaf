@@ -562,6 +562,22 @@ const EditorController = {
     })
   },
 
+  setTypstVersion(projectId, typstVersion, callback) {
+    ProjectOptionsHandler.setTypstVersion(
+      projectId,
+      typstVersion,
+      function (err) {
+        if (err) return callback(err)
+        EditorRealTimeController.emitToRoom(
+          projectId,
+          'typstVersionUpdated',
+          typstVersion
+        )
+        callback()
+      }
+    )
+  },
+
   setImageName(projectId, imageName, callback) {
     ProjectOptionsHandler.setImageName(projectId, imageName, function (err) {
       if (err) {
@@ -716,6 +732,7 @@ EditorController.promises = {
   moveEntity: promisify(EditorController.moveEntity),
   renameProject: promisify(EditorController.renameProject),
   setCompiler: promisify(EditorController.setCompiler),
+  setTypstVersion: promisify(EditorController.setTypstVersion),
   setImageName: promisify(EditorController.setImageName),
   setSpellCheckLanguage: promisify(EditorController.setSpellCheckLanguage),
   setPublicAccessLevel: promisify(EditorController.setPublicAccessLevel),

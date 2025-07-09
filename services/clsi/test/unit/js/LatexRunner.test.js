@@ -64,6 +64,7 @@ describe('LatexRunner', () => {
           directory: this.directory,
           mainFile: this.mainFile,
           compiler: this.compiler,
+          typstVersion: this.typstVersion,
           timeout: this.timeout,
           image: this.image,
           environment: this.env,
@@ -164,6 +165,35 @@ describe('LatexRunner', () => {
           '-lualatex',
           '$COMPILE_DIR/main-file.tex',
         ])
+      })
+    })
+
+    describe('with the Typst compiler', () => {
+      beforeEach(async ctx => {
+        await new Promise((resolve, reject) => {
+          ctx.compiler = 'typst'
+          ctx.typstVersion = 'v0.13.1'
+          ctx.mainFile = 'main.typ'
+          ctx.call(err => {
+            if (err) reject(err)
+            resolve()
+          })
+        })
+      })
+
+      it('should run typst-wrapper with the selected version', ctx => {
+        expect(ctx.env.TYPST_VERSION).to.equal('v0.13.1')
+        ctx.CommandRunner.run.should.have.been.calledWith(ctx.project_id, [
+          'typst-wrapper',
+          'compile',
+          '$COMPILE_DIR/main.typ',
+          '$COMPILE_DIR/output.pdf',
+        ])
+      })
+
+      it('should record one successful compiler run', ctx => {
+        expect(ctx.stats['latex-runs']).to.equal(1)
+        expect(ctx.stats['latexmk-errors']).to.equal(0)
       })
     })
 

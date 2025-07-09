@@ -23,6 +23,7 @@ const TemplatesController = {
       compiler: req.query.compiler,
       language: req.query.language,
       imageName: req.query.imageName,
+      typstVersion: req.query.typstVersion,
       mainFile: req.query.mainFile,
       brandVariationId: req.query.brandVariationId,
     }
@@ -47,7 +48,8 @@ const TemplatesController = {
       req.body.templateVersionId,
       userId,
       req.body.imageName,
-      req.body.language
+      req.body.language,
+      req.body.typstVersion
     )
     delete req.session.templateData
     if (!project) {

@@ -38,6 +38,7 @@ export const ProjectSchema = new Schema(
     version: { type: Number }, // incremented for every change in the project structure (folders and filenames)
     publicAccesLevel: { type: String, default: 'private' },
     compiler: { type: String, default: settings.defaultLatexCompiler },
+    typstVersion: { type: String, default: 'default' },
     spellCheckLanguage: { type: String, default: 'en' },
     deletedByExternalDataSource: { type: Boolean, default: false },
     description: { type: String, default: '' },

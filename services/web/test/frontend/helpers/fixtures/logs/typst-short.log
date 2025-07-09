@@ -1,0 +1,4 @@
+Using default typst
+/compile/chapters/introduction.typ:12:8: warning: unknown font family: missing font
+/compile/main.typ:4:2: error: unknown variable: missing-value
+Typst failed with exit code 1

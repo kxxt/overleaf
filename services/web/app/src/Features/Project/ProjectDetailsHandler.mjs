@@ -46,6 +46,7 @@ async function getDetails(projectId) {
       name: true,
       description: true,
       compiler: true,
+      typstVersion: true,
       features: true,
       owner_ref: true,
       overleaf: true,
@@ -62,6 +63,7 @@ async function getDetails(projectId) {
     name: project.name,
     description: project.description,
     compiler: project.compiler,
+    typstVersion: project.typstVersion,
     features:
       user != null && user.features != null
         ? user.features

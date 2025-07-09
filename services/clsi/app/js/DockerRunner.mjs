@@ -246,6 +246,25 @@ const DockerRunner = {
     const year = match ? match[1] || match[2] : 'rolling'
 
     env.PATH = `/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/texlive/${year}/bin/x86_64-linux/`
+    const mounts = []
+    if (Settings.path.typstPackagesDir) {
+      mounts.push({
+        Target: '/data/typst/packages',
+        Source: Settings.path.typstPackagesDir,
+        Type: 'bind',
+        ReadOnly: true,
+        BindOptions: { ReadOnlyForceRecursive: true },
+      })
+    }
+    if (Settings.path.typstCompilersDir) {
+      mounts.push({
+        Target: '/opt/typst',
+        Source: Settings.path.typstCompilersDir,
+        Type: 'bind',
+        ReadOnly: true,
+        BindOptions: { ReadOnlyForceRecursive: true },
+      })
+    }
     const options = {
       Cmd: command,
       Image: image,
@@ -260,6 +279,7 @@ const DockerRunner = {
         Binds: Object.entries(volumes).map(
           ([hostVol, dockerVol]) => `${hostVol}:${dockerVol}`
         ),
+        Mounts: mounts,
         LogConfig: { Type: 'none', Config: {} },
         Ulimits: [
           {

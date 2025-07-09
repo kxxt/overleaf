@@ -1,3 +1,4 @@
+import { language } from '@codemirror/language'
 import { EditorState } from '@codemirror/state'
 import { SyntaxNode, SyntaxNodeRef } from '@lezer/common'
 import { NodeIntersectsChangeFn, ProjectionItem } from './projection'
@@ -112,6 +113,83 @@ const getEntryText = (state: EditorState, node: SyntaxNodeRef): string => {
  * Extracts FlatOutlineItem instances from the syntax tree
  */
 export const enterNode = (
+  state: EditorState,
+  node: SyntaxNodeRef,
+  items: FlatOutlineItem[],
+  nodeIntersectsChange: NodeIntersectsChangeFn
+): any => {
+  if (state.facet(language)?.name === 'typst') {
+    return enterTypstNode(state, node, items, nodeIntersectsChange)
+  }
+
+  return enterLaTeXNode(state, node, items, nodeIntersectsChange)
+}
+
+const enterTypstNode = (
+  state: EditorState,
+  node: SyntaxNodeRef,
+  items: FlatOutlineItem[],
+  nodeIntersectsChange: NodeIntersectsChangeFn
+): any => {
+  if (!node.type.is('Heading') || !nodeIntersectsChange(node)) {
+    return
+  }
+
+  const heading = node.node
+  const marker = heading.getChild('HeadingMarker')
+  if (!marker) {
+    return
+  }
+
+  const titleParts: string[] = []
+  heading
+    .getChild('Markup')
+    ?.cursor()
+    .iterate(token => {
+      if (token.from >= heading.to) {
+        return false
+      }
+
+      // References, labels, and code expressions do not have a useful static
+      // representation in the outline.
+      if (
+        token.type.is('Ref') ||
+        token.type.is('Label') ||
+        token.type.is('Hash') ||
+        token.type.is('FuncCall')
+      ) {
+        return false
+      }
+
+      // Keep the formatted text, but not the surrounding markup characters.
+      if (
+        (token.node.parent?.type.is('Strong') && token.type.is('Star')) ||
+        (token.node.parent?.type.is('Emph') && token.type.is('Underscore'))
+      ) {
+        return false
+      }
+
+      if (token.node.firstChild) {
+        return true
+      }
+
+      titleParts.push(state.doc.sliceString(token.from, token.to))
+    })
+
+  items.push({
+    line: state.doc.lineAt(heading.from).number,
+    toLine: state.doc.lineAt(heading.to).number,
+    title: titleParts.join(''),
+    from: heading.from,
+    to: heading.to,
+    level: marker.to - marker.from,
+  })
+}
+
+/**
+ * Extracts FlatOutlineItem instances from the syntax tree
+ */
+const enterLaTeXNode = (
   state: EditorState,
   node: SyntaxNodeRef,
   items: FlatOutlineItem[],

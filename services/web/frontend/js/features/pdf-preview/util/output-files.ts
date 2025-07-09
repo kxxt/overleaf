@@ -10,6 +10,9 @@ import { EDITOR_SESSION_ID } from '@/features/pdf-preview/util/metrics'
 import { LogEntry } from './types'
 import { CompileResponseData, PDFFile } from '@ol-types/compile'
 import { LatexLogEntry } from '@/ide/log-parser/latex-log-parser'
+import TypstLogParser, {
+  TypstLogEntry,
+} from '@/ide/log-parser/typst-log-parser'
 import { Annotation } from '@ol-types/annotation'
 import { Folder } from '@ol-types/folder'
 
@@ -92,10 +95,10 @@ export async function handleLogFiles(
 
   function accumulateResults(
     newEntries: {
-      errors?: (LatexLogEntry | BibLogEntry)[]
-      warnings?: (LatexLogEntry | BibLogEntry)[]
-      typesetting?: (LatexLogEntry | BibLogEntry)[]
-      all?: (LatexLogEntry | BibLogEntry)[]
+      errors?: (LatexLogEntry | BibLogEntry | TypstLogEntry)[]
+      warnings?: (LatexLogEntry | BibLogEntry | TypstLogEntry)[]
+      typesetting?: (LatexLogEntry | BibLogEntry | TypstLogEntry)[]
+      all?: (LatexLogEntry | BibLogEntry | TypstLogEntry)[]
     },
     type?: string
   ) {
@@ -127,19 +130,26 @@ export async function handleLogFiles(
       MAX_LOG_SIZE
     )
     try {
-      let { errors, warnings, typesetting } = HumanReadableLogs.parse(
-        result.log,
-        {
-          ignoreDuplicates: true,
+      if (data.options.compiler === 'typst') {
+        const { errors, warnings, typesetting } = new TypstLogParser(
+          result.log
+        ).parse()
+        accumulateResults({ errors, warnings, typesetting })
+      } else {
+        let { errors, warnings, typesetting } = HumanReadableLogs.parse(
+          result.log,
+          {
+            ignoreDuplicates: true,
+          }
+        )
+
+        if (data.status === 'stopped-on-first-error') {
+          // Hide warnings that could disappear after a second pass
+          warnings = warnings.filter(warning => !isTransientWarning(warning))
         }
-      )
 
-      if (data.status === 'stopped-on-first-error') {
-        // Hide warnings that could disappear after a second pass
-        warnings = warnings.filter(warning => !isTransientWarning(warning))
+        accumulateResults({ errors, warnings, typesetting })
       }
-
-      accumulateResults({ errors, warnings, typesetting })
     } catch (e) {
       debugConsole.warn(e) // ignore failure to parse the log file, but log a warning
     }

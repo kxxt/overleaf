@@ -115,32 +115,63 @@ export function getUpdatedProjection<T extends ProjectionItem>(
   }
 ): ProjectionResult<T> {
   // Only reuse results from a Complete parse, otherwise we may drop entries.
-  // We keep items that lie outside the change range, and update their positions.
-  const items: T[] =
-    previousResult.status === ProjectionStatus.Complete
-      ? previousResult
-          .items!.filter(item => !intersects(item.from, item.to, fromA, toA))
-          .map(x => updatePosition(x, transaction))
-      : []
+  // We keep items that lie outside the range that will be reparsed, and update
+  // their positions. Expand the new change range to include the current lines
+  // occupied by invalidated items. This matters when an edit shrinks a syntax
+  // node so that its new range no longer intersects [fromB; toB].
+  let reparseFrom = fromB
+  let reparseTo = toB
+  const reusableItems: T[] = []
+
+  if (previousResult.status === ProjectionStatus.Complete) {
+    for (const item of previousResult.items) {
+      const updatedItem = updatePosition(item, transaction)
+      if (intersects(item.from, item.to, fromA, toA)) {
+        const updatedFrom = Math.max(
+          0,
+          Math.min(updatedItem.from, state.doc.length)
+        )
+        const updatedTo = Math.max(
+          0,
+          Math.min(updatedItem.to, state.doc.length)
+        )
+        reparseFrom = Math.min(
+          reparseFrom,
+          state.doc.lineAt(updatedFrom).from
+        )
+        reparseTo = Math.max(reparseTo, state.doc.lineAt(updatedTo).to)
+      } else {
+        reusableItems.push(updatedItem)
+      }
+    }
+  }
 
   if (previousResult.status !== ProjectionStatus.Complete) {
     // We have previously tried to compute the projection, but unsuccessfully,
     // so we should try to parse the whole file again.
-    toB = state.doc.length
-    fromB = 0
+    reparseTo = state.doc.length
+    reparseFrom = 0
   }
+
+  // Expanding to full lines may include other cached items. Recreate those
+  // from the syntax tree as well so the result does not contain stale or
+  // duplicate entries.
+  const items = reusableItems.filter(
+    item => !intersects(item.from, item.to, reparseFrom, reparseTo)
+  )
+
   const tree = ensureSyntaxTree(
     state,
-    toB,
+    reparseTo,
     initialParse ? FIVE_HUNDRED_MS : TWENTY_MS
   )
   if (tree) {
     tree.iterate({
-      from: fromB,
-      to: toB,
+      from: reparseFrom,
+      to: reparseTo,
       enter(node) {
         const nodeIntersectsChange = (n: SyntaxNodeRef) => {
-          return intersects(n.from, n.to, fromB, toB)
+          return intersects(n.from, n.to, reparseFrom, reparseTo)
         }
         return enterNode(state, node, items, nodeIntersectsChange)
       },

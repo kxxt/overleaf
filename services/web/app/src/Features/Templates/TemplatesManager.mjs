@@ -32,11 +32,15 @@ const TemplatesManager = {
     templateVersionId,
     userId,
     imageName,
-    spellCheckLanguage
+    spellCheckLanguage,
+    typstVersion
   ) {
     compiler = ProjectOptionsHandler.normalizeCompiler(
       compiler || settings.defaultLatexCompiler
     )
+    typstVersion = typstVersion
+      ? ProjectOptionsHandler.normalizeTypstVersion(typstVersion)
+      : undefined
     try {
        imageName = ProjectOptionsHandler.normalizeImageName(imageName)
     } catch {
@@ -57,7 +61,8 @@ const TemplatesManager = {
       const attributes = {
         compiler,
         imageName,
-        spellCheckLanguage
+        spellCheckLanguage,
+        ...(typstVersion ? { typstVersion } : {}),
       }
       if (brandVariationId) attributes.brandVariationId = brandVariationId
 

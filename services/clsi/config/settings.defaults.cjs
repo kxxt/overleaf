@@ -25,6 +25,15 @@ module.exports = {
     synctexBaseDir(projectId) {
       return Path.join(this.compilesDir, projectId)
     },
+    typstPackagesDir: process.env.TYPST_PACKAGES_PATH,
+    // TYPST_COMPILERS_PATH is a host-side path used by DockerRunner for
+    // bind-mounting compilers into sibling compile containers; it is not valid
+    // inside the CLSI container. The compilers are mounted in the container at
+    // the predefined location below, which is where /typst-versions reads from.
+    typstCompilersDir: process.env.TYPST_COMPILERS_PATH,
+    typstCompilersListDir:
+      process.env.TYPST_COMPILERS_LIST_PATH ||
+      Path.resolve(__dirname, '../typst'),
   },
 
   conversionTimeoutSeconds:
@@ -142,6 +151,7 @@ if ((process.env.DOCKER_RUNNER || process.env.SANDBOXED_COMPILES) === 'true') {
         process.env.ALL_TEX_LIVE_DOCKER_IMAGES.split(',')[0].trim(),
       env: {
         HOME: '/tmp',
+        XDG_DATA_HOME: '/data',
         CLSI: 1,
       },
       socketPath: '/var/run/docker.sock',
@@ -179,6 +189,7 @@ if ((process.env.DOCKER_RUNNER || process.env.SANDBOXED_COMPILES) === 'true') {
 
   let seccompProfilePath
   try {
+    // FIXME: create a seccomp profile for typst
     seccompProfilePath = Path.resolve(__dirname, '../seccomp/clsi-profile.json')
     module.exports.clsi.docker.seccomp_profile =
       process.env.SECCOMP_PROFILE ||

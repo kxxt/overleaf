@@ -353,6 +353,11 @@ export const LocalCompileProvider: FC<React.PropsWithChildren> = ({
     compiler.setOption('stopOnFirstError', stopOnFirstError)
   }, [compiler, stopOnFirstError])
 
+  // Keep parser selection tied to structured compile metadata.
+  useEffect(() => {
+    compiler.setOption('compiler', compilerName)
+  }, [compiler, compilerName])
+
   useEffect(() => {
     setUncompiled(changedAt > 0)
   }, [setUncompiled, changedAt])

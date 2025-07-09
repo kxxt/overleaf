@@ -98,6 +98,20 @@ async function createBasicProject(ownerId, projectName) {
   return project
 }
 
+async function createBasicTypstProject(ownerId, projectName) {
+  const project = await _createBlankProject(ownerId, projectName, {
+    compiler: 'typst',
+    typstVersion: 'default',
+  })
+  const docLines = await _buildTemplate('mainbasic.typ', ownerId, projectName)
+  await _createRootDoc(project, ownerId, docLines)
+
+  AnalyticsManager.recordEventForUserInBackground(ownerId, 'project-created', {
+    projectId: project._id,
+  })
+  return project
+}
+
 function hashProjectContent({ fileEntries, docEntries }) {
   const entries = []
   for (const {
@@ -304,7 +318,7 @@ async function _createRootDoc(project, ownerId, docLines) {
     const { doc } = await ProjectEntityUpdateHandler.promises.addDoc(
       project._id,
       project.rootFolder[0]._id,
-      'main.tex',
+      project.compiler === 'typst' ? 'main.typ' : 'main.tex',
       docLines,
       ownerId,
       null
@@ -341,11 +355,13 @@ export default {
   createBlankProject: callbackify(createBlankProject),
   createProjectFromSnippet: callbackify(createProjectFromSnippet),
   createBasicProject: callbackify(createBasicProject),
+  createBasicTypstProject: callbackify(createBasicTypstProject),
   createExampleProject: callbackify(createExampleProject),
   promises: {
     createBlankProject,
     createProjectFromSnippet,
     createBasicProject,
     createExampleProject,
+    createBasicTypstProject,
   },
 }

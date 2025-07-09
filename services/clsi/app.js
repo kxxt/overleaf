@@ -19,6 +19,7 @@ import bodyParser from 'body-parser'
 
 import net from 'node:net'
 import os from 'node:os'
+import fs from 'node:fs/promises'
 import OError from '@overleaf/o-error'
 import ConversionController from './app/js/ConversionController.js'
 import FileUploadMiddleware from './app/js/FileUploadMiddleware.js'
@@ -165,6 +166,28 @@ if (process.env.NODE_ENV === 'development' && global.__coverage__) {
 }
 
 app.get('/status', (req, res, next) => res.send('CLSI is alive\n'))
+
+app.get('/typst-versions', async (req, res, next) => {
+  try {
+    const entries = await fs.readdir(Settings.path.typstCompilersListDir, {
+      withFileTypes: true,
+    })
+    const versions = [{ label: 'Default', value: 'default' }]
+    for (const dirent of entries.sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true })
+    )) {
+      if (dirent.isDirectory() && dirent.name !== 'default') {
+        versions.push({
+          label: dirent.name,
+          value: dirent.name,
+        })
+      }
+    }
+    res.json({ versions })
+  } catch (error) {
+    next(error)
+  }
+})
 
 Settings.processTooOld = false
 if (Settings.processLifespanLimitMs) {

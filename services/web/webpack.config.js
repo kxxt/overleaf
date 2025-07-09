@@ -97,6 +97,10 @@ module.exports = {
 
     // By default write into js directory
     filename: 'js/[name]-[contenthash].js',
+
+    environment: {
+      asyncFunction: true,
+    },
   },
 
   optimization: {
@@ -170,6 +174,14 @@ module.exports = {
       {
         test: /\.wasm$/,
         type: 'asset/resource',
+        resourceQuery: /url/,
+        generator: {
+          filename: 'js/[name]-[contenthash][ext]',
+        },
+      },
+      {
+        test: /typst_syntax_bg\.wasm$/,
+        type: 'webassembly/async',
         generator: {
           filename: 'js/[name]-[contenthash][ext]',
         },

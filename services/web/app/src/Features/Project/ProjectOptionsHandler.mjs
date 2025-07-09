@@ -21,6 +21,21 @@ const ProjectOptionsHandler = {
     return compiler
   },
 
+  normalizeTypstVersion(typstVersion) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(typstVersion)) {
+      throw new OError('invalid typst version', { typstVersion })
+    }
+    return typstVersion
+  },
+
+  async setTypstVersion(projectId, typstVersion) {
+    if (!typstVersion) return
+    typstVersion = ProjectOptionsHandler.normalizeTypstVersion(typstVersion)
+    const conditions = { _id: projectId }
+    const update = { typstVersion }
+    return Project.updateOne(conditions, update, {})
+  },
+
   async setCompiler(projectId, compiler) {
     if (!compiler) {
       return
@@ -116,6 +131,7 @@ const ProjectOptionsHandler = {
 
 export default {
   setCompiler: callbackify(ProjectOptionsHandler.setCompiler),
+  setTypstVersion: callbackify(ProjectOptionsHandler.setTypstVersion),
   setImageName: callbackify(ProjectOptionsHandler.setImageName),
   setSpellCheckLanguage: callbackify(
     ProjectOptionsHandler.setSpellCheckLanguage

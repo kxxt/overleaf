@@ -80,7 +80,7 @@ describe('RequestParser', () => {
       ctx.callback
         .calledWithMatch({
           message:
-            'compiler attribute should be one of: pdflatex, latex, xelatex, lualatex',
+            'compiler attribute should be one of: pdflatex, latex, xelatex, lualatex, typst',
         })
         .should.equal(true)
     })
@@ -100,6 +100,45 @@ describe('RequestParser', () => {
 
     it('should set the compiler to pdflatex by default', ctx => {
       ctx.data.compiler.should.equal('pdflatex')
+    })
+  })
+
+  describe('with a Typst compiler version', () => {
+    it('should use the default version when none is specified', async ctx => {
+      ctx.validRequest.compile.options.compiler = 'typst'
+      const data = await ctx.RequestParser.promises.parse(ctx.validRequest)
+      expect(data.typstVersion).to.equal('default')
+    })
+
+    it('should use the default version for an empty selection', async ctx => {
+      ctx.validRequest.compile.options.compiler = 'typst'
+      ctx.validRequest.compile.options.typstVersion = ''
+      const data = await ctx.RequestParser.promises.parse(ctx.validRequest)
+      expect(data.typstVersion).to.equal('default')
+    })
+
+    it('should normalize a capitalized Default selection', async ctx => {
+      ctx.validRequest.compile.options.compiler = 'typst'
+      ctx.validRequest.compile.options.typstVersion = 'Default'
+      const data = await ctx.RequestParser.promises.parse(ctx.validRequest)
+      expect(data.typstVersion).to.equal('default')
+    })
+
+    it('should accept a version directory name', async ctx => {
+      ctx.validRequest.compile.options.compiler = 'typst'
+      ctx.validRequest.compile.options.typstVersion = 'v0.13.1'
+      const data = await ctx.RequestParser.promises.parse(ctx.validRequest)
+      expect(data.typstVersion).to.equal('v0.13.1')
+    })
+
+    it('should reject path traversal', ctx => {
+      ctx.validRequest.compile.options.compiler = 'typst'
+      ctx.validRequest.compile.options.typstVersion = '../current'
+      ctx.RequestParser.parse(ctx.validRequest, error => {
+        expect(error?.message).to.equal(
+          'typstVersion attribute does not match regex /^[A-Za-z0-9][A-Za-z0-9._-]*$/'
+        )
+      })
     })
   })
 

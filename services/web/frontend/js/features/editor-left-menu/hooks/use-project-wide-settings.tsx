@@ -20,6 +20,15 @@ export default function useProjectWideSettings() {
     [saveProjectSettings]
   )
 
+  const setTypstVersion = useCallback(
+    async (newTypstVersion: ProjectSettings['typstVersion']) => {
+      await saveProjectSettings('typstVersion', newTypstVersion).catch(
+        debugConsole.error
+      )
+    },
+    [saveProjectSettings]
+  )
+
   const setImageName = useCallback(
     async (newImageName: ProjectSettings['imageName']) => {
       await saveProjectSettings('imageName', newImageName).catch(
@@ -35,6 +44,8 @@ export default function useProjectWideSettings() {
   return {
     compiler: project?.compiler,
     setCompiler,
+    typstVersion: project?.typstVersion,
+    setTypstVersion,
     imageName: project?.imageName,
     setImageName,
     rootDocId,

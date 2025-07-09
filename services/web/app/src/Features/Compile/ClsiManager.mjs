@@ -240,6 +240,23 @@ function _throwIfRejected(result) {
   }
 }
 
+async function getTypstVersions(projectId, userId, options = {}) {
+  const { compileBackendClass, compileGroup } = options
+  const url = new URL('/typst-versions', Settings.apis.clsi.url)
+  const opts = { method: 'GET' }
+
+  return (
+    await _makeRequest(
+      projectId,
+      userId,
+      compileGroup,
+      compileBackendClass,
+      url,
+      opts
+    )
+  ).body
+}
+
 async function deleteAuxFiles(projectId, userId, options, clsiserverid) {
   if (options == null) {
     options = {}
@@ -741,6 +758,7 @@ async function _buildRequest(projectId, userId, options) {
   const project = await ProjectGetter.promises.getProject(projectId, {
     compiler: 1,
     imageName: 1,
+    typstVersion: 1,
     'overleaf.history.id': 1,
     ...(options.compileFromHistory ? {} : { rootDoc_id: 1, rootFolder: 1 }),
   })
@@ -1150,6 +1168,7 @@ function _finaliseRequest(projectId, options, project, docs, files) {
         imageName: project.imageName,
         draft: Boolean(options.draft),
         stopOnFirstError: Boolean(options.stopOnFirstError),
+        typstVersion: project.typstVersion,
         check: options.check,
         syncType: options.syncType,
         syncState: options.syncState,
@@ -1313,6 +1332,7 @@ export default {
   promises: {
     sendRequest,
     sendExternalRequest,
+    getTypstVersions,
     stopCompile,
     deleteAuxFiles,
     getOutputFileStream,

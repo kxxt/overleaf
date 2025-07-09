@@ -9,6 +9,7 @@ import {
   getIndentUnit,
   IndentContext,
   indentString,
+  language,
   syntaxTree,
 } from '@codemirror/language'
 import {
@@ -28,6 +29,47 @@ export const ancestorListType = (state: EditorState): string | null => {
     return null
   }
   return getEnvironmentName(ancestorNode, state)
+}
+
+const wrapRangeInTypstList = (
+  state: EditorState,
+  range: SelectionRange,
+  environment: string
+) => {
+  const fromLine = state.doc.lineAt(range.from)
+  const toLine = state.doc.lineAt(range.to)
+  const marker = environment === 'enumerate' ? '+' : '-'
+  const sourceLines = Array.from(
+    state.doc.iterLines(fromLine.number, toLine.number + 1)
+  )
+  const listLine = /^(\s*)([-+])\s+(.*)$/
+  const populatedLines = sourceLines.filter(line => line.trim())
+  const removing =
+    populatedLines.length > 0 &&
+    populatedLines.every(line => line.match(listLine)?.[2] === marker)
+
+  const lines = sourceLines.map(line => {
+    const match = line.match(listLine)
+    if (removing && match) return `${match[1]}${match[3]}`
+    if (match) return `${match[1]}${marker} ${match[3]}`
+    const indentation = line.match(/^\s*/)?.[0] ?? ''
+    return `${indentation}${marker} ${line.slice(indentation.length)}`
+  })
+
+  const changes = [
+    {
+      from: fromLine.from,
+      to: toLine.to,
+      insert: lines.join('\n'),
+    },
+  ]
+
+  range = range.map(state.changes(changes), 1)
+
+  return {
+    range,
+    changes,
+  }
 }
 
 const wrapRangeInList = (
@@ -316,6 +358,14 @@ const toggleListForRange = (
   return { range }
 }
 
+const toggleTypstListForRange = (
+  view: EditorView,
+  range: SelectionRange,
+  environment: string
+) => {
+  return wrapRangeInTypstList(view.state, range, environment)
+}
+
 export const getListItems = (node: SyntaxNode): SyntaxNode[] => {
   const items: SyntaxNode[] = []
 
@@ -335,7 +385,9 @@ export const toggleListForRanges =
   (environment: string) => (view: EditorView) => {
     view.dispatch(
       view.state.changeByRange(range =>
-        toggleListForRange(view, range, environment)
+        (view.state.facet(language)?.name === 'typst'
+          ? toggleTypstListForRange
+          : toggleListForRange)(view, range, environment)
       ),
       { scrollIntoView: true }
     )

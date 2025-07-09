@@ -10,7 +10,7 @@ import getMeta from '@/utils/meta'
 import _ from 'lodash'
 
 function getCompilerOptions(): Option<ProjectCompiler>[] {
-  const compilerOptions = ['pdfLaTeX', 'LaTeX', 'XeLaTeX', 'LuaLaTeX']
+  const compilerOptions = ['pdfLaTeX', 'LaTeX', 'XeLaTeX', 'LuaLaTeX', 'Typst']
   const defaultCompiler = getMeta('ol-defaultLatexCompiler') as ProjectCompiler
   const sortedOptions = _.sortBy(
     compilerOptions,

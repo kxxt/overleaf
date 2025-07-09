@@ -91,6 +91,7 @@ const updateProjectSettingsSchema = z.object({
     name: z.string().optional(),
     rootDocId: zz.objectId().optional(),
     spellCheckLanguage: z.string().optional(),
+    typstVersion: z.string().optional(),
   }),
 })
 
@@ -111,6 +112,13 @@ const _ProjectController = {
 
     if (body.compiler != null) {
       await EditorController.promises.setCompiler(projectId, body.compiler)
+    }
+
+    if (body.typstVersion != null) {
+      await EditorController.promises.setTypstVersion(
+        projectId,
+        body.typstVersion
+      )
     }
 
     if (body.imageName != null) {
@@ -325,12 +333,23 @@ const _ProjectController = {
       req.body.projectName != null ? req.body.projectName.trim() : undefined
     const { template } = req.body
 
-    const project = await (template === 'example'
-      ? ProjectCreationHandler.promises.createExampleProject(
-          userId,
-          projectName
-        )
-      : ProjectCreationHandler.promises.createBasicProject(userId, projectName))
+    let project
+    if (template === 'example') {
+      project = await ProjectCreationHandler.promises.createExampleProject(
+        userId,
+        projectName
+      )
+    } else if (template === 'typst-none') {
+      project = await ProjectCreationHandler.promises.createBasicTypstProject(
+        userId,
+        projectName
+      )
+    } else {
+      project = await ProjectCreationHandler.promises.createBasicProject(
+        userId,
+        projectName
+      )
+    }
 
     ProjectAuditLogHandler.addEntryIfManagedInBackground(
       project._id,

@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import Path from 'node:path'
 let ProjectEditorHandler
 
 export default ProjectEditorHandler = {
@@ -21,6 +20,7 @@ export default ProjectEditorHandler = {
       publicAccesLevel: project.publicAccesLevel,
       dropboxEnabled: !!project.existsInDropbox,
       compiler: project.compiler,
+      typstVersion: project.typstVersion,
       description: project.description,
       spellCheckLanguage: project.spellCheckLanguage,
       deletedByExternalDataSource: project.deletedByExternalDataSource || false,

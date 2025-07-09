@@ -15,6 +15,7 @@ import NonBlinkingCursorSetting from '@/features/settings/components/editor-sett
 import MathPreviewSetting from '@/features/settings/components/editor-settings/math-preview-setting'
 import RootDocumentSetting from '@/features/settings/components/compiler-settings/root-document-setting'
 import CompilerSetting from '@/features/settings/components/compiler-settings/compiler-setting'
+import TypstVersionSetting from '@/features/settings/components/compiler-settings/typst-version-setting'
 import ImageNameSetting from '@/features/settings/components/compiler-settings/image-name-setting'
 import DraftSetting from '@/features/settings/components/compiler-settings/draft-setting'
 import StopOnFirstErrorSetting from '@/features/settings/components/compiler-settings/stop-on-first-error-setting'
@@ -191,6 +192,10 @@ export const SettingsModalProvider: FC<React.PropsWithChildren> = ({
               {
                 key: 'compiler',
                 component: <CompilerSetting />,
+              },
+              {
+                key: 'typstVersion',
+                component: <TypstVersionSetting />,
               },
               {
                 key: 'imageName',
