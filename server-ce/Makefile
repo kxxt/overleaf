@@ -62,12 +62,26 @@ push:
 	docker push $(OVERLEAF_TAG)
 	docker push $(OVERLEAF_BRANCH)
 
+build-self:
+	cp .dockerignore $(MONOREPO_ROOT)
+	docker build \
+	  --build-arg BUILDKIT_INLINE_CACHE=1 \
+	  --progress=plain \
+	  --build-arg OVERLEAF_BASE_TAG \
+	  --label "com.overleaf.ce.revision=$(MONOREPO_REVISION)" \
+	  --file Dockerfile \
+	  --tag sharelatex-self \
+	  --network=host \
+	  $(MONOREPO_ROOT)
+
+
 SHELLCHECK_OPTS = \
 	--shell=bash \
 	--external-sources \
 	--exclude=SC1091
 SHELLCHECK_COLOR := $(if $(CI),--color=never,--color)
 SHELLCHECK_FILES := { git ls-files "*.sh" -z; git grep -Plz "\A\#\!.*bash"; } | sort -zu
+
 
 shellcheck:
 	@$(SHELLCHECK_FILES) | xargs -0 -r docker run --rm -v $(HERE):/mnt -w /mnt \
@@ -82,5 +96,5 @@ shellcheck_fix:
 	done
 
 .PHONY: all \
-	build-base build-community \
+	build-base build-community build-self \
 	shellcheck shellcheck_fix
