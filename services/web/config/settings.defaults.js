@@ -426,9 +426,12 @@ module.exports = {
     github: true,
     gitBridge: true,
     versioning: true,
-    compileTimeout: 180,
+    compileTimeout: 300,
     compileGroup: 'standard',
     references: true,
+    referencesSearch: true,
+    mendeley: true,
+    symbolPalette: true,
     trackChanges: true,
   }),
 
@@ -827,20 +830,35 @@ module.exports = {
     : undefined,
 
   nav: {
-    title: process.env.APP_NAME || 'Overleaf Community Edition',
+    title: process.env.APP_NAME || '中国科大在线 Latex 平台',
 
     hide_powered_by: process.env.NAV_HIDE_POWERED_BY === 'true',
     left_footer: [],
 
     right_footer: [
       {
-        text: '<a href="https://github.com/overleaf/overleaf">Fork on GitHub!</a>',
+        text: '网络信息中心',
+        url: 'https://ustcnet.ustc.edu.cn/main.htm',
       },
     ],
 
     showSubscriptionLink: false,
 
-    header_extras: [],
+    header_extras: [
+      {
+        text: '帮助',
+        dropdown: [
+          {
+            url: '/guide.pdf',
+            text: '用户手册',
+          },
+          {
+            url: 'https://www.overleaf.com/learn',
+            text: '官方文档',
+          },
+        ],
+      },
+    ],
   },
   // Example:
   //   header_extras: [{text: "Some Page", url: "http://example.com/some/page", class: "subdued"}]

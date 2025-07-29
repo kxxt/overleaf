@@ -147,11 +147,11 @@ services:
     env_file:
       - dev.env
     environment:
-      - APP_NAME=Overleaf Community Edition
+      - APP_NAME=USTC Latex
       - ENABLED_LINKED_FILE_TYPES=project_file,project_output_file,zotero
       - EMAIL_CONFIRMATION_DISABLED=true
       - NODE_ENV=development
-      - OVERLEAF_ALLOW_PUBLIC_ACCESS=true
+      - OVERLEAF_ALLOW_PUBLIC_ACCESS=false
     command: ["node", "app.mjs"]
     volumes:
       - sharelatex-data:/var/lib/overleaf
@@ -178,7 +178,7 @@ services:
     command:
       ["npx", "webpack", "serve", "--config", "webpack.config.dev-env.js"]
     ports:
-      - "127.0.0.1:80:3808"
+      - "18888:3808"
     volumes:
       - ./webpack.config.dev-env.js:/overleaf/services/web/webpack.config.dev-env.js
 

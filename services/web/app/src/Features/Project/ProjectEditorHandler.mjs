@@ -44,15 +44,15 @@ export default ProjectEditorHandler = {
       collaborators: -1, // Infinite
       versioning: false,
       dropbox: false,
-      compileTimeout: 60,
+      compileTimeout: 300,
       compileGroup: 'standard',
       templates: false,
-      references: false,
-      referencesSearch: false,
-      mendeley: false,
-      trackChanges: false,
+      references: true,
+      referencesSearch: true,
+      mendeley: true,
+      trackChanges: true,
       trackChangesVisible: ProjectEditorHandler.trackChangesAvailable,
-      symbolPalette: false,
+      symbolPalette: true,
     })
 
     if (result.features.trackChanges) {

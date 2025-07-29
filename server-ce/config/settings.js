@@ -299,11 +299,14 @@ const settings = {
   defaultFeatures: {
     collaborators: -1,
     dropbox: true,
+    github: true,
     versioning: true,
-    compileTimeout: parseIntOrFail(process.env.COMPILE_TIMEOUT || 180),
+    compileTimeout: parseIntOrFail(process.env.COMPILE_TIMEOUT || 300),
     compileGroup: 'standard',
     trackChanges: true,
     references: true,
+    symbolPalette: true,
+    referencesSearch: true,
   },
 }
 
