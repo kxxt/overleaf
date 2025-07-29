@@ -50,6 +50,8 @@ export const UserSchema = new Schema(
       default: '',
       maxlength: MAX_NAME_LENGTH,
     },
+    zjhm: { type: String, default: '' },
+    gid: String,
     role: { type: String, default: '' },
     institution: { type: String, default: '' },
     hashedPassword: String,

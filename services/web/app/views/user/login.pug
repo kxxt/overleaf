@@ -7,7 +7,7 @@ block content
 	main#main-content.content
 		.container
 			.row
-				.col-lg-6.offset-lg-3.col-xl-4.offset-xl-4
+				.col-lg-6.offset-lg-3.col-xl-6.offset-xl-3
 					.page-header
 						if login_support_title
 							h1 !{login_support_title}
@@ -66,3 +66,17 @@ block content
 							)
 								span(data-ol-inflight="idle") #{settings.oidc.identityServiceName}
 								span(hidden data-ol-inflight="pending") #{translate("logging_in")}…
+					.actions(style='margin-top: 30px;')
+						a.button.btn-primary.btn(
+							href='/caslogin',
+							style='width: 100%;'
+						)
+							| 中国科大统一身份认证
+					h2.mt-4 使用说明
+					ul
+						li 平台使用中国科大统一身份认证登录。如需开通校外合作账户，请发送邮件申请。
+						li 平台支持无限数量合作者、历史记录、审阅批注、中文支持、Git 同步等功能。
+						li
+							span.text-danger 平台仅提供基础服务功能，需师生自行负责数据备份，请注意及时备份数据。
+						li 如有使用问题，请联系：
+							a(href='mailto:latex@ustc.edu.cn') latex AT ustc.edu.cn

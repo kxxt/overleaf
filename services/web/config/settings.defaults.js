@@ -741,6 +741,9 @@ module.exports = {
   // public projects, /learn, /templates, about pages, etc.
   allowPublicAccess: process.env.OVERLEAF_ALLOW_PUBLIC_ACCESS === 'true',
 
+  casURL: process.env.CASURL || 'https://passport.ustc.edu.cn/',
+  casServiceStr: process.env.CAS_SERVICE_STR || `${siteUrl}/caslogin`,
+
   // editor should be open by default
   editorIsOpen: process.env.EDITOR_OPEN !== 'false',
 

@@ -13,6 +13,7 @@ import UploadsRouter from './Features/Uploads/UploadsRouter.mjs'
 import metrics from '@overleaf/metrics'
 import ReferalController from './Features/Referal/ReferalController.mjs'
 import AuthenticationController from './Features/Authentication/AuthenticationController.mjs'
+import CasAuthenticationController from './Features/Authentication/CasAuthenticationController.mjs'
 import PermissionsController from './Features/Authorization/PermissionsController.mjs'
 import SessionManager from './Features/Authentication/SessionManager.mjs'
 import TagsController from './Features/Tags/TagsController.mjs'
@@ -262,6 +263,9 @@ async function initialize(webRouter, privateApiRouter, publicApiRouter) {
     AuthenticationController.requireLogin(),
     SocketDiagnostics.index
   )
+
+  webRouter.get('/caslogin', CasAuthenticationController.login)
+  AuthenticationController.addEndpointToLoginWhitelist('/caslogin')
 
   if (Settings.enableLegacyLogin) {
     AuthenticationController.addEndpointToLoginWhitelist('/login/legacy')

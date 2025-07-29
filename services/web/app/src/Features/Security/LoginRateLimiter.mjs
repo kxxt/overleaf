@@ -7,8 +7,8 @@ import { InvalidRequestError } from '@overleaf/validation-tools'
 const rateLimiterLoginEmail = new RateLimiter(
   'login',
   Settings.rateLimit?.login?.email || {
-    points: 10,
-    duration: 120,
+    points: 5,
+    duration: 600,
   }
 )
 
