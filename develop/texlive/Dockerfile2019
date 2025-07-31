@@ -17,7 +17,7 @@ RUN cd /usr/share/fonts/truetype && mkfontscale && mkfontdir && fc-cache -fsv
 #https://ftp.math.utah.edu/pub/tex/historic/
 
 RUN wget -O - -- https://mirrors.tuna.tsinghua.edu.cn/tex-historic-archive/systems/texlive/2019/install-tl-unx.tar.gz | tar xzf - --strip-components=1
-RUN sh -c '/bin/echo -e "I\n" | perl ./install-tl -repository https://mirrors.tuna.tsinghua.edu.cn/tex-historic-archive/systems/texlive/2019/tlnet-final/ -scheme full'
+RUN sh -c '/bin/echo -e "I\n" | perl ./install-tl -repository https://mirrors.tuna.tsinghua.edu.cn/tex-historic-archive/systems/texlive/2019/tlnet-final/ --no-interaction -scheme full'
 
 RUN $(find /usr/local/texlive -name tlmgr) path add \
 &&  tlmgr install --repository https://mirrors.tuna.tsinghua.edu.cn/tex-historic-archive/systems/texlive/2019/tlnet-final \
