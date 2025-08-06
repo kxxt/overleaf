@@ -2325,6 +2325,8 @@
   "using_premium_features": "使用高级功能",
   "using_the_overleaf_editor": "使用 __appName__ 编辑器",
   "using_writefull": "使用 Writefull",
+  "ustcthesis_project": "中国科大学位论文",
+  "ustcbeamer_project": "中国科大 Beamer 幻灯片",
   "valid": "有效的",
   "valid_sso_configuration": "有效的 SSO 配置",
   "validation_issue_entry_description": "阻止此项目编译的验证问题",

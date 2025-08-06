@@ -1,3 +1,9 @@
 [submodule "services/typst-packages"]
 	path = develop/typst-packages
 	url = https://github.com/typst/packages/
+[submodule "services/web/app/templates/project_files/ustcthesis"]
+	path = services/web/app/templates/project_files/ustcthesis
+	url = https://github.com/ustctug/ustcthesis
+[submodule "services/web/app/templates/project_files/ustcbeamer"]
+	path = services/web/app/templates/project_files/ustcbeamer
+	url = https://github.com/ustctug/ustcbeamer

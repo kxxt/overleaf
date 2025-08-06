@@ -5,11 +5,13 @@ import { Tag } from '../../../../../../app/src/Features/Tags/types'
 type ExampleProjectModalProps = {
   onHide: () => void
   initialTags?: Tag[]
+  template?: string
 }
 
 function ExampleProjectModal({
   onHide,
   initialTags,
+  template = 'example',
 }: ExampleProjectModalProps) {
   return (
     <OLModal
@@ -21,7 +23,7 @@ function ExampleProjectModal({
     >
       <ModalContentNewProjectForm
         onCancel={onHide}
-        template="example"
+        template={template}
         initialTags={initialTags}
       />
     </OLModal>

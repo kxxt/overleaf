@@ -19,6 +19,9 @@ import TpdsUpdateSender from '../ThirdPartyDataStore/TpdsUpdateSender.mjs'
 import SplitTestHandler from '../SplitTests/SplitTestHandler.mjs'
 import ClsiCacheManager from '../Compile/ClsiCacheManager.mjs'
 import crypto from 'node:crypto'
+import ProjectDeleter from './ProjectDeleter.mjs'
+import ProjectRootDocManager from './ProjectRootDocManager.mjs'
+import { DeletedProjectReasons } from './DeletedProjectReasons.mjs'
 
 const { ObjectId } = mongodb
 
@@ -129,6 +132,55 @@ function hashProjectContent({ fileEntries, docEntries }) {
     hash.update(item)
   }
   return hash.digest('hex')
+}
+
+async function createProjectFromBuiltinTemplate(
+  ownerId,
+  projectName,
+  template,
+  compiler,
+  rootDoc
+) {
+  const project = await _createBlankProject(ownerId, projectName, { compiler })
+  try {
+    // This dynamic import avoids the existing ProjectUploadManager ->
+    // ProjectCreationHandler module dependency becoming a static ESM cycle.
+    const { default: ProjectUploadManager } = await import(
+      '../Uploads/ProjectUploadManager.mjs'
+    )
+    const templatePath = path.join(
+      import.meta.dirname,
+      '../../../templates/project_files',
+      template
+    )
+    await ProjectUploadManager.promises.initializeProjectWithContents(
+      ownerId,
+      project,
+      templatePath
+    )
+    await ProjectRootDocManager.promises.setRootDocFromName(project._id, rootDoc)
+  } catch (error) {
+    logger.error(
+      { err: error, template },
+      'error creating project from template'
+    )
+    ProjectDeleter.promises
+      .deleteProject(project._id, {
+        deletedReason: DeletedProjectReasons.BUILTIN_TEMPLATE_FAILURE,
+      })
+      .catch(err =>
+        logger.error(
+          { err, projectId: project._id },
+          'there was an error cleaning up project after creating project from a builtin template failed'
+        )
+      )
+    throw error
+  }
+  AnalyticsManager.recordEventForUserInBackground(ownerId, 'project-created', {
+    projectId: project._id,
+  })
+
+  return project
 }
 
 let exampleProjectContentHash
@@ -363,5 +415,6 @@ export default {
     createBasicProject,
     createExampleProject,
     createBasicTypstProject,
+    createProjectFromBuiltinTemplate,
   },
 }

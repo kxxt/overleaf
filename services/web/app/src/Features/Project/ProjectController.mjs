@@ -333,6 +333,16 @@ const _ProjectController = {
       req.body.projectName != null ? req.body.projectName.trim() : undefined
     const { template } = req.body
 
+    const builtinTemplates = {
+      ustcthesis: { compiler: 'xelatex', rootDoc: 'main.tex' },
+      ustcbeamer: { compiler: 'xelatex', rootDoc: 'main.tex' },
+      'ieee-conf': { compiler: 'xelatex', rootDoc: 'main.tex' },
+      'ieee-journal': { compiler: 'xelatex', rootDoc: 'bare_jrnl.tex' },
+      acm: {
+        compiler: 'pdflatex',
+        rootDoc: 'samples/sample-acmsmall.tex',
+      },
+    }
     let project
     if (template === 'example') {
       project = await ProjectCreationHandler.promises.createExampleProject(
@@ -344,6 +354,16 @@ const _ProjectController = {
         userId,
         projectName
       )
+    } else if (Object.hasOwn(builtinTemplates, template)) {
+      const { compiler, rootDoc } = builtinTemplates[template]
+      project =
+        await ProjectCreationHandler.promises.createProjectFromBuiltinTemplate(
+          userId,
+          projectName,
+          template,
+          compiler,
+          rootDoc
+        )
     } else {
       project = await ProjectCreationHandler.promises.createBasicProject(
         userId,

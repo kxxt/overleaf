@@ -3088,6 +3088,8 @@
   "using_premium_features": "Using premium features",
   "using_the_overleaf_editor": "Using the __appName__ Editor",
   "using_writefull": "Using Writefull",
+  "ustcthesis_project": "USTC Thesis",
+  "ustcbeamer_project": "USTC Beamer",
   "valid": "Valid",
   "valid_sso_configuration": "Valid SSO configuration",
   "validation_issue_entry_description": "A validation issue which prevented this project from compiling",

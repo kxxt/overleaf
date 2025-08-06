@@ -24,6 +24,7 @@ export default {
     createProjectFromZipArchiveWithName
   ),
   promises: {
+    initializeProjectWithContents: _initializeProjectWithZipContents,
     createProjectFromZipArchive,
     createProjectFromZipArchiveWithName,
   },

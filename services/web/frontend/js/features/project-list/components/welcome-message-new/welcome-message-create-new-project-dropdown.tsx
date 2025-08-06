@@ -139,6 +139,77 @@ function WelcomeMessageCreateNewProjectDropdown({
           <DropdownItem
             as="button"
             onClick={e =>
+              handleDropdownItemClick(
+                e,
+                'ustcthesis_project',
+                'ustcthesis-project'
+              )
+            }
+            tabIndex={-1}
+          >
+            {t('ustcthesis_project')}
+          </DropdownItem>
+        </li>
+        <li role="none">
+          <DropdownItem
+            as="button"
+            onClick={e =>
+              handleDropdownItemClick(
+                e,
+                'ustcbeamer_project',
+                'ustcbeamer-project'
+              )
+            }
+            tabIndex={-1}
+          >
+            {t('ustcbeamer_project')}
+          </DropdownItem>
+        </li>
+        <li role="none">
+          <DropdownItem
+            as="button"
+            onClick={e =>
+              handleDropdownItemClick(
+                e,
+                'ieeeconf_project',
+                'ieeeconf-project'
+              )
+            }
+            tabIndex={-1}
+          >
+            IEEE Conference
+          </DropdownItem>
+        </li>
+        <li role="none">
+          <DropdownItem
+            as="button"
+            onClick={e =>
+              handleDropdownItemClick(
+                e,
+                'ieeejournal_project',
+                'ieeejournal-project'
+              )
+            }
+            tabIndex={-1}
+          >
+            IEEE Journal
+          </DropdownItem>
+        </li>
+        <li role="none">
+          <DropdownItem
+            as="button"
+            onClick={e =>
+              handleDropdownItemClick(e, 'acm_project', 'acm-project')
+            }
+            tabIndex={-1}
+          >
+            ACM Paper
+          </DropdownItem>
+        </li>
+        <li role="none">
+          <DropdownItem
+            as="button"
+            onClick={e =>
               handleDropdownItemClick(e, 'example_project', 'example-project')
             }
             tabIndex={-1}

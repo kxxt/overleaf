@@ -220,6 +220,66 @@ function NewProjectButton({
             <DropdownItem
               onClick={e =>
                 handleModalMenuClick(e, {
+                  modalVariant: 'ustcthesis_project',
+                  dropdownMenuEvent: 'ustcthesis-project',
+                })
+              }
+            >
+              {t('ustcthesis_project')}
+            </DropdownItem>
+          </li>
+          <li role="none">
+            <DropdownItem
+              onClick={e =>
+                handleModalMenuClick(e, {
+                  modalVariant: 'ustcbeamer_project',
+                  dropdownMenuEvent: 'ustcbeamer-project',
+                })
+              }
+            >
+              {t('ustcbeamer_project')}
+            </DropdownItem>
+          </li>
+          <li role="none">
+            <DropdownItem
+              onClick={e =>
+                handleModalMenuClick(e, {
+                  modalVariant: 'ieeeconf_project',
+                  dropdownMenuEvent: 'ieeeconf-project',
+                })
+              }
+            >
+              IEEE Conference
+            </DropdownItem>
+          </li>
+          <li role="none">
+            <DropdownItem
+              onClick={e =>
+                handleModalMenuClick(e, {
+                  modalVariant: 'ieeejournal_project',
+                  dropdownMenuEvent: 'ieeejournal-project',
+                })
+              }
+            >
+              IEEE Journal
+            </DropdownItem>
+          </li>
+          <li role="none">
+            <DropdownItem
+              onClick={e =>
+                handleModalMenuClick(e, {
+                  modalVariant: 'acm_project',
+                  dropdownMenuEvent: 'acm-project',
+                })
+              }
+            >
+              ACM Paper
+            </DropdownItem>
+          </li>
+          <li role="none">
+            <DropdownItem
+              onClick={e =>
+                handleModalMenuClick(e, {
                   modalVariant: 'example_project',
                   dropdownMenuEvent: 'example-project',
                 })

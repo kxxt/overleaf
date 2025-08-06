@@ -4,5 +4,6 @@ export const DeletedProjectReasons = /** @type {const} */ ({
   ZIP_IMPORT_FAILURE: 'zip-import-failure',
   CLONE_FAILURE: 'clone-failure',
   GITHUB_IMPORT_FAILURE: 'github-import-failure',
+  BUILTIN_TEMPLATE_FAILURE: 'builtin-template-failure',
   SCRIPT: 'script',
 })
