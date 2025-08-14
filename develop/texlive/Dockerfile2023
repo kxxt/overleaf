@@ -1,10 +1,10 @@
-FROM debian:testing
+FROM debian:bookworm
 
 ENV TEXMFVAR=/var/lib/sharelatex/tmp/texmf-var
 
-RUN echo "deb http://mirrors.ustc.edu.cn/debian/ testing main" > /etc/apt/sources.list
-RUN echo "deb http://mirrors.ustc.edu.cn/debian/ testing-updates main" >> /etc/apt/sources.list
-RUN apt-get update && apt install -y --no-install-recommends fontconfig inkscape pandoc python3-pygments xfonts-utils tex-common texinfo equivs perl-tk perl-doc wget ca-certificates rsync && apt clean
+RUN echo "deb http://mirrors.ustc.edu.cn/debian/ bookworm main" > /etc/apt/sources.list
+RUN echo "deb http://mirrors.ustc.edu.cn/debian/ bookworm-updates main" >> /etc/apt/sources.list
+RUN apt-get update && apt install -y --no-install-recommends fontconfig inkscape pandoc python3-pygments xfonts-utils tex-common texinfo equivs perl-tk perl-doc wget ca-certificates rsync fonts-texgyre fonts-texgyre-math && apt clean
 
 # add truetype fonts
 RUN mkdir -p /usr/share/fonts/truetype
@@ -30,6 +30,9 @@ RUN $(find /usr/local/texlive -name tlmgr) path add \
 
 # ENV PATH="/usr/local/texlive/2023/bin/x86_64-linux:${PATH}"
 # RUN apt install -y texlive-full texlive-lang-cjk texlive-lang-chinese texlive-lang-japanese texlive-lang-korean texlive-font-utils texlive-fonts-extra texlive-extra-utils texlive-science
+RUN apt-get install -y ghostscript
+
+COPY typst-wrapper /usr/bin/typst-wrapper
 
 RUN useradd -m tex
 USER tex
