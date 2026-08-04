@@ -1,8 +1,9 @@
 import logger from '@overleaf/logger'
-import crypto from 'crypto'
-import { ObjectId } from 'mongodb'
+import crypto from 'node:crypto'
+import mongodb from 'mongodb-legacy'
 import { db } from '../../../../app/src/infrastructure/mongodb.mjs'
-import { OauthApplication } from '../../../../app/src/models/OauthApplication.mjs'
+
+const { ObjectId } = mongodb
 
 const PAT_PREFIX = 'olp_'
 const PAT_LENGTH = 36 // without 'olp_' prefix
@@ -78,9 +79,13 @@ const GitBridgePATManager = {
   },
 
   async deleteToken(tokenId, user_id) {
+    if (!ObjectId.isValid(tokenId)) return 0
+
     const query = {
       _id: new ObjectId(tokenId),
       user_id,
+      type: 'personal_access_token',
+      scope: /\bgit_bridge\b/,
     }
     const result = await db.oauthAccessTokens.deleteOne(query)
     return result?.deletedCount || 0
