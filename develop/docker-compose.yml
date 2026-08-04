@@ -166,6 +166,7 @@ services:
       - EMAIL_CONFIRMATION_DISABLED=true
       - NODE_ENV=development
       - OVERLEAF_ALLOW_PUBLIC_ACCESS=false
+      - OVERLEAF_SITE_LANGUAGE=zh-CN
       - SANDBOXED_COMPILES=true
       - TEX_LIVE_DOCKER_IMAGE=texlive-full
       - ALL_TEX_LIVE_DOCKER_IMAGES=texlive-full,texlive-2019,texlive-2022,texlive-2023,texlive-2024
