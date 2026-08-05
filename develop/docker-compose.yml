@@ -162,6 +162,7 @@ services:
       - dev.env
     environment:
       - APP_NAME=USTC Latex
+      - ADMIN_PRIVILEGE_AVAILABLE=true
       - ENABLED_LINKED_FILE_TYPES=project_file,project_output_file,zotero
       - EMAIL_CONFIRMATION_DISABLED=true
       - NODE_ENV=development
