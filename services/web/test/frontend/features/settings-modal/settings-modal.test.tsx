@@ -5,6 +5,7 @@ import { EditorProviders } from '../../helpers/editor-providers'
 import SettingsModal from '@/features/settings/components/settings-modal'
 import { Folder } from '@ol-types/folder'
 import { ImageName, OverallThemeMeta } from '@ol-types/project-settings'
+import sinon from 'sinon'
 
 const selectTab = async (tabName: string) => {
   const tab = screen.getByRole('tab', { name: tabName })
@@ -111,6 +112,28 @@ describe('<SettingsModal />', function () {
   afterEach(function () {
     fetchMock.removeRoutes().clearHistory()
     window.metaAttributesCache.set('ol-ExposedSettings', originalSettings)
+  })
+
+  it('does not create an invalid element for an unavailable optional setting', function () {
+    const consoleError = sinon.stub(console, 'error')
+
+    try {
+      render(
+        <EditorProviders
+          rootFolder={[rootFolder as any]}
+          layoutContext={{ leftMenuShown: true }}
+        >
+          <SettingsModal />
+        </EditorProviders>
+      )
+
+      const renderedInvalidElementWarning = consoleError
+        .getCalls()
+        .some(call => String(call.args[0]).includes('React.jsx: type is invalid'))
+      expect(renderedInvalidElementWarning).to.be.false
+    } finally {
+      consoleError.restore()
+    }
   })
 
   it('Shows all settings options', async function () {

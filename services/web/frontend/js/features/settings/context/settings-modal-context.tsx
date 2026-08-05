@@ -133,7 +133,9 @@ export const SettingsModalProvider: FC<React.PropsWithChildren> = ({
               },
               {
                 key: 'write-and-cite-settings',
-                component: <ReferenceSearchSetting />,
+                component: ReferenceSearchSetting ? (
+                  <ReferenceSearchSetting />
+                ) : null,
                 hidden: !ReferenceSearchSetting,
               },
             ],
