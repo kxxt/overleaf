@@ -16,6 +16,7 @@ import {
    ForbiddenError,
 } from '../../../../app/src/Features/Errors/Errors.js'
 import TokenManager from './TokenManager.mjs'
+import { getProxyFetchOpts } from './ZoteroProxyAgent.mjs'
 
 const ZOTERO_API_URL = 'https://api.zotero.org'
 const REQUEST_TIMEOUT_MS = 60 * 1000
@@ -46,6 +47,7 @@ async function getConnectionStatus(userId) {
     await fetchJson(`${ZOTERO_API_URL}/keys/${apiKey}`, {
       headers: buildHeaders(apiKey),
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      ...getProxyFetchOpts(),
     })
     return true
   } catch (err) {
@@ -64,7 +66,8 @@ async function getGroupsForUser(userId) {
   try {
     const groups = await fetchJson(`${ZOTERO_API_URL}/users/${zoteroUserId}/groups`, {
       headers: buildHeaders(apiKey),
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      ...getProxyFetchOpts(),
     })
     return groups.map(g => ({
       id: String(g.id),
@@ -110,7 +113,8 @@ async function _fetchBibtex(apiKey, basePath, format) {
       const url = `${ZOTERO_API_URL}${basePath}?format=${format}&limit=${limit}&start=${start}`
       const { body: bibtex, response } = await fetchStringWithResponse(url, {
         headers,
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        ...getProxyFetchOpts(),
       })
 
       if (bibtex.trim()) allBibtex += bibtex
@@ -145,6 +149,7 @@ async function unlinkAccount(userId) {
       method: 'DELETE',
       headers: buildHeaders(apiKey),
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      ...getProxyFetchOpts(),
     })
   } catch (err) {
      logger.error({ err }, 'failed to detete key from Zotero account')

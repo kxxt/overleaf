@@ -13,6 +13,9 @@ if (Settings.enabledLinkedFileTypes?.includes('zotero')) {
     clientKey: process.env.ZOTERO_CLIENT_KEY,
     clientSecret: process.env.ZOTERO_CLIENT_SECRET,
     callbackURL: `${siteUrl}/user/zotero/oauth/callback`,
+    // Optional HTTP proxy used for all requests to Zotero, e.g.
+    // 'http://user:pass@proxy.example.com:8080'
+    httpProxy: process.env.ZOTERO_HTTP_PROXY,
   },
 
   ZoteroModule = {

@@ -4,6 +4,7 @@ import OError from '@overleaf/o-error'
 import { fetchString } from '@overleaf/fetch-utils'
 import OAuth from 'oauth-1.0a'
 import crypto from 'crypto'
+import { getProxyFetchOpts } from './ZoteroProxyAgent.mjs'
 
 const ZOTERO_OAUTH_URL = 'https://www.zotero.org/oauth'
 
@@ -65,6 +66,7 @@ async function getRequestToken() {
           },
         }),
       },
+      ...getProxyFetchOpts(),
     })
 
     return parseOAuthResponse(body)
@@ -98,6 +100,7 @@ async function exchangeRequestTokenForAccessToken(
           }
         ),
       },
+      ...getProxyFetchOpts(),
     })
 
     const data = parseOAuthResponse(body)
