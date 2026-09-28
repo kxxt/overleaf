@@ -13,11 +13,6 @@ const ImportDocumentModal = lazy(() => import('./import-document-modal'))
 export type NewProjectButtonModalVariant =
   | 'blank_project'
   | 'blank_typst_project'
-  | 'ustcthesis_project'
-  | 'ustcbeamer_project'
-  | 'ieeeconf_project'
-  | 'ieeejournal_project'
-  | 'acm_project'
   | 'example_project'
   | 'upload_project'
   | 'import_from_github'
@@ -74,46 +69,6 @@ function NewProjectButtonModal({
       )
     case 'example_project':
       return <ExampleProjectModal onHide={onHide} initialTags={initialTags} />
-    case 'ustcthesis_project':
-      return (
-        <ExampleProjectModal
-          onHide={onHide}
-          initialTags={initialTags}
-          template="ustcthesis"
-        />
-      )
-    case 'ustcbeamer_project':
-      return (
-        <ExampleProjectModal
-          onHide={onHide}
-          initialTags={initialTags}
-          template="ustcbeamer"
-        />
-      )
-    case 'ieeeconf_project':
-      return (
-        <ExampleProjectModal
-          onHide={onHide}
-          initialTags={initialTags}
-          template="ieee-conf"
-        />
-      )
-    case 'ieeejournal_project':
-      return (
-        <ExampleProjectModal
-          onHide={onHide}
-          initialTags={initialTags}
-          template="ieee-journal"
-        />
-      )
-    case 'acm_project':
-      return (
-        <ExampleProjectModal
-          onHide={onHide}
-          initialTags={initialTags}
-          template="acm"
-        />
-      )
     case 'upload_project':
       return (
         <Suspense fallback={<FullSizeLoadingSpinner delay={500} />}>

@@ -24,6 +24,7 @@ import { useFeatureFlag } from '@/shared/context/split-test-context'
 import MaterialIcon from '@/shared/components/material-icon'
 import { useProjectListContext } from '@/features/project-list/context/project-list-context'
 import { isSplitTestEnabled } from '@/utils/splitTestUtils'
+import { templateGalleryProjects } from './template-gallery-projects'
 
 type SendTrackingEvent = {
   dropdownMenu: string
@@ -216,66 +217,16 @@ function NewProjectButton({
               {t('blank_typst_project')}
             </DropdownItem>
           </li>
-          <li role="none">
-            <DropdownItem
-              onClick={e =>
-                handleModalMenuClick(e, {
-                  modalVariant: 'ustcthesis_project',
-                  dropdownMenuEvent: 'ustcthesis-project',
-                })
-              }
-            >
-              {t('ustcthesis_project')}
-            </DropdownItem>
-          </li>
-          <li role="none">
-            <DropdownItem
-              onClick={e =>
-                handleModalMenuClick(e, {
-                  modalVariant: 'ustcbeamer_project',
-                  dropdownMenuEvent: 'ustcbeamer-project',
-                })
-              }
-            >
-              {t('ustcbeamer_project')}
-            </DropdownItem>
-          </li>
-          <li role="none">
-            <DropdownItem
-              onClick={e =>
-                handleModalMenuClick(e, {
-                  modalVariant: 'ieeeconf_project',
-                  dropdownMenuEvent: 'ieeeconf-project',
-                })
-              }
-            >
-              IEEE Conference
-            </DropdownItem>
-          </li>
-          <li role="none">
-            <DropdownItem
-              onClick={e =>
-                handleModalMenuClick(e, {
-                  modalVariant: 'ieeejournal_project',
-                  dropdownMenuEvent: 'ieeejournal-project',
-                })
-              }
-            >
-              IEEE Journal
-            </DropdownItem>
-          </li>
-          <li role="none">
-            <DropdownItem
-              onClick={e =>
-                handleModalMenuClick(e, {
-                  modalVariant: 'acm_project',
-                  dropdownMenuEvent: 'acm-project',
-                })
-              }
-            >
-              ACM Paper
-            </DropdownItem>
-          </li>
+          {templateGalleryProjects.map(template => (
+            <li role="none" key={template.trackingKey}>
+              <DropdownItem
+                href={template.url}
+                onClick={e => handleStaticTemplateClick(e, template)}
+              >
+                {template.label || t(template.name)}
+              </DropdownItem>
+            </li>
+          ))}
           <li role="none">
             <DropdownItem
               onClick={e =>

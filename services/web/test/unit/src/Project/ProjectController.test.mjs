@@ -67,9 +67,6 @@ describe('ProjectController', function () {
         createExampleProject: sinon.stub().resolves({ _id: ctx.project_id }),
         createBasicProject: sinon.stub().resolves({ _id: ctx.project_id }),
         createBasicTypstProject: sinon.stub().resolves({ _id: ctx.project_id }),
-        createProjectFromBuiltinTemplate: sinon
-          .stub()
-          .resolves({ _id: ctx.project_id }),
       },
     }
     ctx.SubscriptionLocator = {
@@ -821,38 +818,6 @@ describe('ProjectController', function () {
         ctx.ProjectController.newProject(ctx.req, ctx.res)
       })
     })
-
-    const builtinTemplates = [
-      ['ustcthesis', 'xelatex', 'main.tex'],
-      ['ustcbeamer', 'xelatex', 'main.tex'],
-      ['ieee-conf', 'xelatex', 'main.tex'],
-      ['ieee-journal', 'xelatex', 'bare_jrnl.tex'],
-      ['acm', 'pdflatex', 'samples/sample-acmsmall.tex'],
-    ]
-
-    for (const [template, compiler, rootDoc] of builtinTemplates) {
-      it(`should create the ${template} built-in template`, async function (ctx) {
-        await new Promise(resolve => {
-          ctx.req.body.template = template
-          ctx.res.json = () => {
-            ctx.ProjectCreationHandler.promises.createProjectFromBuiltinTemplate
-              .calledWith(
-                ctx.user._id,
-                ctx.projectName,
-                template,
-                compiler,
-                rootDoc
-              )
-              .should.equal(true)
-            ctx.ProjectCreationHandler.promises.createBasicProject.called.should.equal(
-              false
-            )
-            resolve()
-          }
-          ctx.ProjectController.newProject(ctx.req, ctx.res)
-        })
-      })
-    }
 
     it('adds project audit log for managed for managed users', async function (ctx) {
       await new Promise(resolve => {
