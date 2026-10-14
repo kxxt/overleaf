@@ -76,6 +76,9 @@ describe('ProjectRootDocManager', function () {
 
   describe('setRootDocAutomatically', function () {
     beforeEach(function (ctx) {
+      ctx.ProjectGetter.promises.getProject = sinon
+        .stub()
+        .resolves({ compiler: 'pdflatex' })
       ctx.ProjectEntityUpdateHandler.promises.setRootDoc = sinon
         .stub()
         .resolves()
@@ -185,6 +188,123 @@ describe('ProjectRootDocManager', function () {
           false
         )
       })
+    })
+
+    describe('for a Typst project', function () {
+      beforeEach(function (ctx) {
+        ctx.ProjectGetter.promises.getProject.resolves({ compiler: 'typst' })
+        ctx.docs = {
+          '/main.tex': {
+            _id: ctx.docId1,
+            lines: ['\\documentclass{article}'],
+          },
+          '/test.typ': { _id: ctx.docId2, lines: [] },
+        }
+        ctx.ProjectEntityHandler.promises.getAllDocs = sinon
+          .stub()
+          .resolves(ctx.docs)
+      })
+
+      it('selects test.typ without a documentclass and ignores main.tex', async function (ctx) {
+        await ctx.ProjectRootDocManager.promises.setRootDocAutomatically(
+          ctx.project_id
+        )
+
+        expect(
+          ctx.ProjectEntityUpdateHandler.promises.setRootDoc
+        ).to.have.been.calledOnceWithExactly(ctx.project_id, ctx.docId2)
+      })
+
+      it('prefers main.typ when it exists', async function (ctx) {
+        ctx.docs['/main.typ'] = { _id: ctx.docId3, lines: ['Hello'] }
+        await ctx.ProjectRootDocManager.promises.setRootDocAutomatically(
+          ctx.project_id
+        )
+
+        expect(
+          ctx.ProjectEntityUpdateHandler.promises.setRootDoc
+        ).to.have.been.calledOnceWithExactly(ctx.project_id, ctx.docId3)
+      })
+
+      it('prefers shallower documents and then sorts by path', async function (ctx) {
+        ctx.docs['/nested/main.typ'] = { _id: ctx.docId3, lines: [] }
+        ctx.docs['/a.typ'] = { _id: ctx.docId4, lines: [] }
+        await ctx.ProjectRootDocManager.promises.setRootDocAutomatically(
+          ctx.project_id
+        )
+
+        expect(
+          ctx.ProjectEntityUpdateHandler.promises.setRootDoc
+        ).to.have.been.calledOnceWithExactly(ctx.project_id, ctx.docId4)
+      })
+
+      it('accepts a nested .TYP document', async function (ctx) {
+        delete ctx.docs['/test.typ']
+        ctx.docs['/nested/test.TYP'] = { _id: ctx.docId3, lines: [] }
+        await ctx.ProjectRootDocManager.promises.setRootDocAutomatically(
+          ctx.project_id
+        )
+
+        expect(
+          ctx.ProjectEntityUpdateHandler.promises.setRootDoc
+        ).to.have.been.calledOnceWithExactly(ctx.project_id, ctx.docId3)
+      })
+
+      it('leaves the root unset when there are no Typst documents', async function (ctx) {
+        delete ctx.docs['/test.typ']
+        const result =
+          await ctx.ProjectRootDocManager.promises.setRootDocAutomatically(
+            ctx.project_id
+          )
+
+        expect(result).to.be.undefined
+        expect(ctx.ProjectEntityUpdateHandler.promises.setRootDoc).not.to.have
+          .been.called
+      })
+    })
+  })
+
+  describe('Typst root document recovery', function () {
+    it('recovers test.typ after deleting main.typ and trying to compile without a main document', async function (ctx) {
+      const project = { compiler: 'typst', rootDoc_id: ctx.docId1 }
+      const docs = {}
+      ctx.ProjectGetter.promises.getProject = sinon.stub().resolves(project)
+      ctx.ProjectEntityHandler.promises.getAllDocs = sinon.stub().resolves(docs)
+      ctx.ProjectEntityHandler.promises.getDocPathFromProjectByDocId = sinon
+        .stub()
+        .resolves(null)
+      ctx.ProjectEntityUpdateHandler.isPathValidForRootDoc = sinon
+        .stub()
+        .returns(true)
+      ctx.ProjectEntityUpdateHandler.promises.unsetRootDoc = sinon
+        .stub()
+        .callsFake(async () => {
+          delete project.rootDoc_id
+        })
+      ctx.ProjectEntityUpdateHandler.promises.setRootDoc = sinon
+        .stub()
+        .callsFake(async (projectId, rootDocId) => {
+          project.rootDoc_id = rootDocId
+          return { rootDocId, rootResourcePath: '/test.typ' }
+        })
+
+      expect(
+        await ctx.ProjectRootDocManager.promises.ensureRootDocumentIsValid(
+          ctx.project_id
+        )
+      ).to.be.undefined
+
+      docs['/test.typ'] = { _id: ctx.docId2, lines: ['Hello Typst'] }
+
+      expect(
+        await ctx.ProjectRootDocManager.promises.ensureRootDocumentIsValid(
+          ctx.project_id
+        )
+      ).to.deep.equal({
+        rootDocId: ctx.docId2,
+        rootResourcePath: '/test.typ',
+      })
+      expect(project.rootDoc_id).to.equal(ctx.docId2)
     })
   })
 

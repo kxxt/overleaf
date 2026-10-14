@@ -1083,6 +1083,7 @@ async function _getContentFromMongo(projectId) {
 }
 
 function _finaliseRequest(projectId, options, project, docs, files) {
+  const mainFile = project.compiler === 'typst' ? 'main.typ' : 'main.tex'
   const resources = []
   let flags = []
   let rootResourcePath = options.rootResourcePath
@@ -1113,7 +1114,7 @@ function _finaliseRequest(projectId, options, project, docs, files) {
     ) {
       rootResourcePathOverride = path
     }
-    if (path === 'main.tex') {
+    if (path === mainFile) {
       hasMainFile = true
     }
   }
@@ -1123,7 +1124,7 @@ function _finaliseRequest(projectId, options, project, docs, files) {
   }
   if (rootResourcePath == null) {
     if (hasMainFile) {
-      rootResourcePath = 'main.tex'
+      rootResourcePath = mainFile
     } else if (numberOfDocsInProject === 1) {
       // only one file, must be the main document
       for (const path in docs) {
@@ -1154,7 +1155,9 @@ function _finaliseRequest(projectId, options, project, docs, files) {
   }
 
   if (process.env.TEX_COMPILER_EXTRA_FLAGS) {
-    flags.push(...process.env.TEX_COMPILER_EXTRA_FLAGS.split(/\s+/).filter(Boolean))
+    flags.push(
+      ...process.env.TEX_COMPILER_EXTRA_FLAGS.split(/\s+/).filter(Boolean)
+    )
   }
 
   return {

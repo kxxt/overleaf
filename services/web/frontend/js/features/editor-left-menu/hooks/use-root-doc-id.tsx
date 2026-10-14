@@ -3,10 +3,13 @@ import { useIdeReactContext } from '@/features/ide-react/context/ide-react-conte
 import { useProjectContext } from '@/shared/context/project-context'
 import type { ProjectSettings } from '../utils/api'
 import useSaveProjectSettings from './use-save-project-settings'
+import { useTypstRootDoc } from '@/shared/hooks/use-root-doc'
 
 export default function useRootDocId() {
   const { project } = useProjectContext()
-  const rootDocId = project?.rootDocId
+  const typstRootDoc = useTypstRootDoc()
+  const rootDocId =
+    project?.compiler === 'typst' ? typstRootDoc?.doc.id : project?.rootDocId
   const { permissionsLevel } = useIdeReactContext()
   const saveProjectSettings = useSaveProjectSettings()
 

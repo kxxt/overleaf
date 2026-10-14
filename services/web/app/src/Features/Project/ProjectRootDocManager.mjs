@@ -34,7 +34,37 @@ function setRootDocAutomaticallyInBackground(projectId) {
 }
 
 async function setRootDocAutomatically(projectId) {
-  const docs = await ProjectEntityHandler.promises.getAllDocs(projectId)
+  const [project, docs] = await Promise.all([
+    ProjectGetter.promises.getProject(projectId, { compiler: 1 }),
+    ProjectEntityHandler.promises.getAllDocs(projectId),
+  ])
+
+  if (project?.compiler === 'typst') {
+    // Typst documents have no documentclass marker. Use the same fallback order
+    // as the editor: main.typ, then the nearest .typ document in path order.
+    const candidates = Object.entries(docs)
+      .filter(
+        ([path, doc]) =>
+          /\.typ$/i.test(path) &&
+          ProjectEntityUpdateHandler.isPathValidForRootDoc(path) &&
+          doc._id
+      )
+      .map(([path, doc]) => ({ path: path.replace(/^\//, ''), doc }))
+      .sort(
+        (a, b) =>
+          a.path.split('/').length - b.path.split('/').length ||
+          a.path.localeCompare(b.path)
+      )
+    const rootDoc =
+      candidates.find(doc => doc.path === 'main.typ') ?? candidates[0]
+    if (rootDoc) {
+      return await ProjectEntityUpdateHandler.promises.setRootDoc(
+        projectId,
+        rootDoc.doc._id
+      )
+    }
+    return
+  }
 
   for (const [path, doc] of Object.entries(docs)) {
     if (

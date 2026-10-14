@@ -182,7 +182,7 @@ describe('ClsiManager', function () {
       },
       enablePdfCaching: true,
       clsiCookie: { key: 'clsiserver' },
-      safeCompilers: ['pdflatex', 'latex', 'xelatex', 'lualatex'],
+      safeCompilers: ['pdflatex', 'latex', 'xelatex', 'lualatex', 'typst'],
       defaultLatexCompiler: 'pdflatex',
     }
     ctx.ClsiCacheHandler = {
@@ -374,6 +374,7 @@ describe('ClsiManager', function () {
             compiler: 1,
             rootDoc_id: 1,
             imageName: 1,
+            typstVersion: 1,
             rootFolder: 1,
             'overleaf.history.id': 1,
           }
@@ -524,6 +525,7 @@ describe('ClsiManager', function () {
             compiler: 1,
             rootDoc_id: 1,
             imageName: 1,
+            typstVersion: 1,
             rootFolder: 1,
             'overleaf.history.id': 1,
           }
@@ -660,6 +662,7 @@ describe('ClsiManager', function () {
             compiler: 1,
             rootDoc_id: 1,
             imageName: 1,
+            typstVersion: 1,
             rootFolder: 1,
             'overleaf.history.id': 1,
           }
@@ -872,6 +875,30 @@ describe('ClsiManager', function () {
 
       it('should report a validation problem', function (ctx) {
         expect(ctx.result.status).to.equal('validation-problems')
+      })
+    })
+
+    describe('when a Typst project has no valid root document', function () {
+      it('uses main.typ rather than main.tex', async function (ctx) {
+        ctx.project.compiler = 'typst'
+        ctx.project.rootDoc_id = 'not-valid'
+        ctx.docs['/main.typ'] = {
+          name: 'main.typ',
+          _id: 'typst-doc-id',
+          lines: ['Hello Typst'],
+        }
+        await ctx.ClsiManager.promises.sendRequest(
+          ctx.project._id,
+          ctx.user_id,
+          {}
+        )
+
+        expect(ctx.FetchUtils.fetchStringWithResponse).to.have.been.calledWith(
+          sinon.match.any,
+          sinon.match({
+            json: { compile: { rootResourcePath: 'main.typ' } },
+          })
+        )
       })
     })
 
