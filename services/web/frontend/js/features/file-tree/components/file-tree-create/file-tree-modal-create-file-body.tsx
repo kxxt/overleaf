@@ -12,6 +12,7 @@ import { ElementType, lazy, Suspense } from 'react'
 import { FullSizeLoadingSpinner } from '@/shared/components/loading-spinner'
 import getMeta from '@/utils/meta'
 import OLNotification from '@/shared/components/ol/ol-notification'
+import { useProjectContext } from '@/shared/context/project-context'
 
 const allCreateFileModeModules = importOverleafModules('createFileModes') as {
   import: { CreateFilePane: ElementType; CreateFileMode: ElementType }
@@ -27,6 +28,8 @@ const FileTreeUploadDoc = lazy(() => import('./modes/file-tree-upload-doc'))
 
 export default function FileTreeModalCreateFileBody() {
   const { t } = useTranslation()
+  const { project } = useProjectContext()
+  const defaultName = project?.compiler === 'typst' ? 'name.typ' : 'name.tex'
 
   const { newFileCreateMode } = useFileTreeActionable()
   const { fileCount } = useFileTreeData()
@@ -113,7 +116,7 @@ export default function FileTreeModalCreateFileBody() {
                 />
               )}
             {newFileCreateMode === 'doc' && (
-              <FileTreeCreateNameProvider initialName="name.tex">
+              <FileTreeCreateNameProvider initialName={defaultName}>
                 <FileTreeCreateNewDoc />
               </FileTreeCreateNameProvider>
             )}
