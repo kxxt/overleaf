@@ -165,6 +165,7 @@ services:
       - ADMIN_PRIVILEGE_AVAILABLE=true
       - ENABLED_LINKED_FILE_TYPES=project_file,project_output_file,zotero
       - EMAIL_CONFIRMATION_DISABLED=true
+      - GIT_BRIDGE_ENABLED=true
       - NODE_ENV=development
       - OVERLEAF_ALLOW_PUBLIC_ACCESS=false
       - OVERLEAF_SITE_LANGUAGE=zh-CN
@@ -204,6 +205,14 @@ services:
 
   git-bridge:
     image: quay.io/sharelatex/git-bridge:latest
+    # Docker creates the data bind mount as root. Fix ownership, then run as node.
+    user: root
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        chown node:node "$$GIT_BRIDGE_ROOT_DIR"
+        exec setpriv --reuid=node --regid=node --init-groups /start.sh
     expose:
       - "8000"
     ports:
